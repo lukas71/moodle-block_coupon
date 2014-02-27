@@ -22,13 +22,9 @@ if ($id)    //DEFAULT CHECKS
     {
         print_error("Instance id incorrect");
     }
-    $context = get_context_instance(CONTEXT_BLOCK, $instance->id);
-    $courseid = get_courseid_from_context($context);
 
-    if (!$course = $DB->get_record("course", array("id" => $courseid)))
-    {
-        $course = get_site();
-    }
+    $course = get_site();
+    $context = context_course::instance($course->id);
 
     require_login($course, true);
     //ADD course LINK
@@ -103,7 +99,7 @@ if (voucher_Helper::getPermission('inputvouchers'))
             if (!$DB->get_record('course', array('id'=>$voucher->courseid))) print_error(get_string('error:missing_course', BLOCK_VOUCHER));
             
             // Make sure we only enrol if its not enrolled yet
-            $context = get_context_instance(CONTEXT_COURSE, $voucher->courseid);
+            $context = context_course::instance($voucher->courseid);
             if (!is_enrolled($context, $USER->id)) {
                 
                 $end_enrolment = 0;

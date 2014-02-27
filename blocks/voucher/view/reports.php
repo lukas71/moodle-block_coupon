@@ -22,13 +22,9 @@ if ($id)    //DEFAULT CHECKS
     {
         print_error("Instance id incorrect");
     }
-    $context = get_context_instance(CONTEXT_BLOCK, $instance->id);
-    $courseid = get_courseid_from_context($context);
 
-    if (!$course = $DB->get_record("course", array("id" => $courseid)))
-    {
-        $course = get_site();
-    }
+    $course = get_site();
+    $context = context_course::instance($course->id);
 
     require_login($course, true);
     //ADD course LINK
@@ -64,9 +60,16 @@ if (voucher_Helper::getPermission('viewreports'))
     // For each user we'll get a list of courses that apply for them
     foreach($vouchers as $vid=>$voucher) {
         
-        // Now we get the user
-        $user = $DB->get_record('user', array('id'=>$voucher->userid));
-        if (!isset($reportdata->users[$user->id])) $reportdata->users[$user->id] = $user;
+        // Get user
+        if (!$user = $DB->get_record('user', array('id'=>$voucher->userid))) {
+            // If not exists just skip the row
+            continue;
+        }
+
+        // Only need course-data of one completed voucher
+        if (!isset($reportdata->users[$user->id])) {
+            $reportdata->users[$user->id] = $user;
+        }
         
         $voucher_users[$voucher->userid] = $user;
         $voucher_users[$voucher->userid]->courses = array();
@@ -74,9 +77,18 @@ if (voucher_Helper::getPermission('viewreports'))
         // If its a course voucher its simple
         if ($voucher->courseid !== NULL) {
             
-            // Skip if its already added, could happen with multiple vouchers on 1 course
-            if (in_array($voucher->courseid, $voucher_users[$voucher->userid]->courses)) continue;
-            $voucher_users[$voucher->userid]->courses[$voucher->courseid] = $DB->get_record('course', array('id'=>$voucher->courseid));
+            // Skip if its already added
+            // Could only happen with multiple vouchers for 1 user on 1 course
+            if (in_array($voucher->courseid, $voucher_users[$voucher->userid]->courses)) {
+                continue;
+            }
+            
+            // Skip if no course could be found
+            if (!$tmpCourse = $DB->get_record('course', array('id'=>$voucher->courseid))) {
+                continue;
+            }
+            
+            $voucher_users[$voucher->userid]->courses[$voucher->courseid] = $tmpCourse;
             
             if (!isset($reportdata->courses[$voucher->courseid])) {
                 $reportdata->courses[$voucher->courseid] = $voucher_users[$voucher->userid]->courses[$voucher->courseid];

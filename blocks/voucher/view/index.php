@@ -22,13 +22,9 @@ if ($id)    //DEFAULT CHECKS
     {
         print_error("Instance id incorrect");
     }
-    $context = get_context_instance(CONTEXT_BLOCK, $instance->id);
-    $courseid = get_courseid_from_context($context);
 
-    if (!$course = $DB->get_record("course", array("id" => $courseid)))
-    {
-        $course = get_site();
-    }
+    $course = get_site();
+    $context = context_course::instance($course->id);
 
     require_login($course, true);
     //ADD course LINK
