@@ -350,3 +350,6 @@ Moodle administrator';
 
 $string['voucher_recipients_desc'] = 'The following columns are required to be present, regardless of order: E-mail, Gender, Name';
 $string['voucher_recipients_manual_desc'] = 'The following columns are required, regardless of order: E-mail, Gender, Name';
+
+$string['no_cohorts_found'] = 'No cohorts have been found.';
+$string['no_courses_found'] = 'No courses have been found.';

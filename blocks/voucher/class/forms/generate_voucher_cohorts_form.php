@@ -43,6 +43,12 @@ class generate_voucher_cohorts_form extends moodleform
         
         // And create data for multiselect
         $arr_cohort_select = array();
+        
+        // Make sure we've got at least one of 'em
+        if (empty($cohorts)) {
+            print_error('no_cohorts_found', BLOCK_VOUCHER);
+        }
+        
         foreach($cohorts as $cohort) $arr_cohort_select[$cohort->id] = $cohort->name;
 
         // Course id

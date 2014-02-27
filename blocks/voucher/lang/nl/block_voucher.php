@@ -365,3 +365,6 @@ Bij dezen informeren wij u graag dat de vouchers die u op {$a->timecreated} heef
 Met vriendelijke groet,<br /><Br />
 
 Moodle administrator';
+
+$string['no_cohorts_found'] = 'Er zijn geen cohorten gevonden.';
+$string['no_courses_found'] = 'Er zijn geen cursussen gevonden.';

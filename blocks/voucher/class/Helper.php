@@ -261,7 +261,7 @@ class voucher_Helper {
         // set email from
         if ($initiatedByCron) {
             // get supportuser
-            $supportuser = generate_email_supportuser();
+            $supportuser = core_user::get_support_user();
             $phpMailer->FromName = fullname($supportuser);
             $phpMailer->From = $supportuser->email;
             
@@ -309,7 +309,7 @@ class voucher_Helper {
         
         $owner = voucher_Db::GetUser(array('id'=>$ownerid));
         
-        $supportuser = generate_email_supportuser();
+        $supportuser = core_user::get_support_user();
         $mail_content = get_string("confirm_vouchers_sent_body", BLOCK_VOUCHER, array('timecreated'=>date('Y-m-d', $timecreated)));
 
         $phpmailer = new PHPMailer();
@@ -560,8 +560,8 @@ class voucher_Helper {
      * @return array | boolean
      */
     final static public function getPermission($name = '') {
-        $context = get_context_instance(CONTEXT_SYSTEM);
-
+        $context = context_system::instance();
+        
         $array = array();
         //FIRST check if you are a super admin
         $array['administration'] = (has_capability('block/voucher:administration', $context)) ? true : false;

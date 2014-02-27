@@ -43,6 +43,10 @@ class generate_voucher_course_form extends moodleform
         
         // And create data for multiselect
         $arr_courses_select = array();
+        
+        if (empty($courses)) {
+            print_error('no_courses_found', BLOCK_VOUCHER);
+        }
         foreach($courses as $course) $arr_courses_select[$course->id] = $course->fullname;
 
         // Course id
