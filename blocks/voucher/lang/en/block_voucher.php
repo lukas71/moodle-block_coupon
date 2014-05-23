@@ -356,3 +356,5 @@ $string['voucher_recipients_manual_desc'] = 'The following columns are required,
 
 $string['no_cohorts_found'] = 'No cohorts have been found.';
 $string['no_courses_found'] = 'No courses have been found.';
+
+$string['report:download-excel'] = 'Download unused vouchers';

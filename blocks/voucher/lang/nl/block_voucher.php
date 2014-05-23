@@ -371,3 +371,5 @@ Moodle administrator';
 
 $string['no_cohorts_found'] = 'Er zijn geen cohorten gevonden.';
 $string['no_courses_found'] = 'Er zijn geen cursussen gevonden.';
+
+$string['report:download-excel'] = 'Download ongebruikte vouchers';
