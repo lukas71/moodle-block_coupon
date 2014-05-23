@@ -26,13 +26,13 @@ class voucher_Cron
         
         // Call vouchers
         $vouchers = voucher_Db::GetVouchersToSend();
-//        exit("<pre>" . print_r($vouchers, true) . "</pre>");
         
         if (!$vouchers || empty($vouchers)) return true; // return true to keep other crons running
         
         // Omdat we geen koppeltabel hebben...
         $sentVouchers = array();
-        
+        $voucherSend = time(); // Dit moet even om ervoor te zorgen dat dingen per owner gegroepeerd worden
+        //let op: dit verkloot meerdere batches per owner - Sebastian dd 2014-03-19
         foreach($vouchers as $voucher) {
             
             // Check if we have an owner
@@ -44,7 +44,7 @@ class voucher_Cron
                 }
                 
                 if (!in_array($voucher->timecreated, $sentVouchers[$voucher->ownerid])) {
-                    $sentVouchers[$voucher->ownerid][] = $voucher->timecreated;
+                    $sentVouchers[$voucher->ownerid][] = $voucherSend;
                 }
                 
             }
