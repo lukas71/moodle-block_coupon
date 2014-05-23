@@ -31,7 +31,7 @@ if ($id)    //DEFAULT CHECKS
     $PAGE->navbar->add(ucfirst($course->fullname), new moodle_url('/course/view.php', array('id' => $course->id)));
 }
 
-$url = new moodle_url('/blocks/voucher/view/my_vouchers.php', array('id' => $id));
+$url = new moodle_url('/blocks/voucher/view/unused_vouchers.php', array('id' => $id));
 $PAGE->set_url($url);
 
 $PAGE->set_title(get_string('view:reports-unused:title', BLOCK_VOUCHER));
