@@ -173,8 +173,11 @@ $string['button:submit_voucher_code'] = 'Submit Voucher';
 $string['view:generate_voucher:title'] = 'Generate Voucher';
 $string['view:generate_voucher:heading'] = 'Generate Voucher';
 
-$string['view:reports:heading'] = 'Voucher Reports';
-$string['view:reports:title'] = 'Voucher Reports';
+$string['view:reports:heading'] = 'Report - Vouchers';
+$string['view:reports:title'] = 'Report - Vouchers';
+
+$string['view:reports-unused:title'] = 'Report - Unused Vouchers';
+$string['view:reports-unused:heading'] = 'Report - Unused Vouchers';
 
 $string['view:input_voucher:title'] = 'Input Voucher';
 $string['view:input_voucher:heading'] = 'Input Voucher';
@@ -296,7 +299,7 @@ $string['report:heading:grade'] = 'Grade';
 
 $string['report:owner'] = 'Owner';
 $string['report:senddate'] = 'Send date';
-$string['report:enrolperiod'] = 'Owner';
+$string['report:enrolperiod'] = 'Enrolled days';
 $string['report:voucher_code'] = 'Subscription code';
 $string['report:cohorts'] = 'Cohort';
 $string['report:issend'] = 'Is send';

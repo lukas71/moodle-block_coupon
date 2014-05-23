@@ -34,8 +34,8 @@ if ($id)    //DEFAULT CHECKS
 $url = new moodle_url('/blocks/voucher/view/my_vouchers.php', array('id' => $id));
 $PAGE->set_url($url);
 
-$PAGE->set_title(get_string('view:generate_voucher:title', BLOCK_VOUCHER));
-$PAGE->set_heading(get_string('view:generate_voucher:heading', BLOCK_VOUCHER));
+$PAGE->set_title(get_string('view:reports-unused:title', BLOCK_VOUCHER));
+$PAGE->set_heading(get_string('view:reports-unused:heading', BLOCK_VOUCHER));
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('standard');
 
