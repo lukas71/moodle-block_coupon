@@ -77,6 +77,8 @@ $string['error:wrong_image_size'] = 'The uploaded background does not have the r
 $string['error:moodledata_not_writable'] = 'Your moodledata/voucher_logos folder is not writable. Please fix your permissions.';
 
 $string['error:wrong_doc_page'] = 'You are trying to access a page that does not exist.';
+$string['error:course-vouchers-not-copied'] = 'An error occured while trying to copy voucher-courses to the new voucher_courses table. Please contact support.';
+
 
 // Success strings
 $string['success:voucher_used'] = 'Voucher used - You can now access the course(s)';

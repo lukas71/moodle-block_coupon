@@ -79,6 +79,8 @@ $string['error:alternative_email_invalid'] = 'Als \'Gebruik alternatief e-mail a
 $string['error:moodledata_not_writable'] = 'U heeft geen schrijfrechten op moodledata/voucher_logos. Pas uw rechten aan.';
 $string['error:wrong_image_size'] = 'De afbeelding heeft niet de juiste afmetingen. Probeer het opnieuw met een afbeelding met een verhouding van 210 mm bij 297 mm.';
 $string['error:wrong_doc_page'] = 'U probeert een pagina te bereiken die niet bestaat.';
+$string['error:course-vouchers-not-copied'] = 'De voucher cursussen zijn niet correct overgekopieerd naar de nieuwe voucher_courses tabel. Neem contact op met support.';
+
 
 // Success strings
 $string['success:voucher_used'] = 'Voucher gebruikt - U kunt nu uw nieuwe cursus(en) in';

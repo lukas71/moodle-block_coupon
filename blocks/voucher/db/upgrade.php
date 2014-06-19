@@ -83,6 +83,11 @@ function xmldb_block_voucher_upgrade($oldversion) {
             
         }
         
+        $courseVouchers = $DB->get_records('voucher_courses');
+        if (count($vouchers) != count($courseVouchers)) {
+            print_error('error:course-vouchers-not-copied', BLOCK_VOUCHER);
+        }
+        
         // And drop the old field
         $vouchersTable = new xmldb_table('vouchers');
         $courseidField = new xmldb_field('courseid', XMLDB_TYPE_INTEGER, '18', null, null, null, null, 'ownerid');
