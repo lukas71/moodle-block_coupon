@@ -79,7 +79,10 @@ if (voucher_Helper::getPermission('generatevouchers'))
         if ($SESSION->voucher->type == 'course') {
             
             // Add selected groups to session
-            if (isset($data->voucher_groups)) $SESSION->voucher->groups = $data->voucher_groups;
+            if (isset($data->voucher_groups)) {
+                $SESSION->voucher->groups = $data->voucher_groups;
+            }
+            
         } else {
             
             // Check if a course is selected

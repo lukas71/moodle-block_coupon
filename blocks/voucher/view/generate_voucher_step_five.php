@@ -72,11 +72,9 @@ if (voucher_Helper::getPermission('generatevouchers'))
         $vouchers = array();
         foreach($recipients as $recipient) {
             
-//            $moodle_user = voucher_Db::GetUser((array)$recipient);
-            
             $voucher = new stdClass();
             $voucher->ownerid = $USER->id;
-            $voucher->courseid = ($SESSION->voucher->type == 'course') ? $SESSION->voucher->course : null;
+            $voucher->courses = ($SESSION->voucher->type == 'course') ? $SESSION->voucher->courses : null;
             $voucher->submission_code = VoucherGenerator::GenerateUniqueCode($voucher_code_length);
             
             // Extra fields

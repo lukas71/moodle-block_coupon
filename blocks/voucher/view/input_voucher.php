@@ -68,9 +68,10 @@ if (voucher_Helper::getPermission('inputvouchers'))
         
         $role = $DB->get_record('role', array('shortname'=>'student'));
         $voucher = $DB->get_record('vouchers', array('submission_code'=>$data->voucher_code));
+        $voucherCourses = $DB->get_records('voucher_courses', array('voucherid'=>$voucher->id));
         
         // We'll handle voucher_cohorts
-        if ($voucher->courseid === null) {
+        if (empty($voucherCourses)) {
             
             $voucher_cohorts = $DB->get_records('voucher_cohorts', array('voucherid'=>$voucher->id));
             if (count($voucher_cohorts) == 0) print_error(get_string('error:missing_cohort', BLOCK_VOUCHER));
@@ -95,26 +96,36 @@ if (voucher_Helper::getPermission('inputvouchers'))
         // Otherwise we'll handle based on courses
         } else {
             
-            // Important checks
-            if (!$DB->get_record('course', array('id'=>$voucher->courseid))) print_error(get_string('error:missing_course', BLOCK_VOUCHER));
-            
-            // Make sure we only enrol if its not enrolled yet
-            $context = context_course::instance($voucher->courseid);
-            if (!is_enrolled($context, $USER->id)) {
-                
-                $end_enrolment = 0;
-                
-                if (!is_null($voucher->enrolperiod) && $voucher->enrolperiod > 0) {
-                    $end_enrolment = strtotime("+ {$voucher->enrolperiod} days");
-                }
-                // Now we can enrol
-                if (!enrol_try_internal_enrol($voucher->courseid, $USER->id, $role->id, time(), $end_enrolment)) {
-                    print_error(get_string('error:unable_to_enrol', BLOCK_VOUCHER));
-                }
-                $context->mark_dirty();
-                remove_temp_course_roles($context);
+            // Set enrolment period
+            $end_enrolment = 0;
+            if (!is_null($voucher->enrolperiod) && $voucher->enrolperiod > 0) {
+                $end_enrolment = strtotime("+ {$voucher->enrolperiod} days");
             }
-            
+
+            foreach($voucherCourses as $voucherCourse) {
+
+                // Important checks
+                if (!$DB->get_record('course', array('id'=>$voucherCourse->courseid))) print_error(get_string('error:missing_course', BLOCK_VOUCHER));
+
+                // Make sure we only enrol if its not enrolled yet
+                $context = context_course::instance($voucherCourse->courseid);
+                if (!is_enrolled($context, $USER->id)) {
+
+                    $end_enrolment = 0;
+
+                    if (!is_null($voucher->enrolperiod) && $voucher->enrolperiod > 0) {
+                        $end_enrolment = strtotime("+ {$voucher->enrolperiod} days");
+                    }
+                    // Now we can enrol
+                    if (!enrol_try_internal_enrol($voucherCourse->courseid, $USER->id, $role->id, time(), $end_enrolment)) {
+                        print_error(get_string('error:unable_to_enrol', BLOCK_VOUCHER));
+                    }
+                    $context->mark_dirty();
+                    remove_temp_course_roles($context);
+                }
+                
+            }
+
             // And add user to groups
             $voucher_groups = $DB->get_records('voucher_groups', array('voucherid'=>$voucher->id));
             if (!empty($voucher_groups)) {

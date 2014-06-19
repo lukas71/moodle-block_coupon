@@ -65,6 +65,7 @@ if (voucher_Helper::getPermission('viewreports'))
             // If not exists just skip the row
             continue;
         }
+        $voucherCourses = $DB->get_records('voucher_courses', array('voucherid'=>$voucher->id));
 
         // Only need course-data of one completed voucher
         if (!isset($reportdata->users[$user->id])) {
@@ -75,23 +76,25 @@ if (voucher_Helper::getPermission('viewreports'))
         $voucher_users[$voucher->userid]->courses = array();
         
         // If its a course voucher its simple
-        if ($voucher->courseid !== NULL) {
+        if (!empty($voucherCourses)) {
             
-            // Skip if its already added
-            // Could only happen with multiple vouchers for 1 user on 1 course
-            if (in_array($voucher->courseid, $voucher_users[$voucher->userid]->courses)) {
-                continue;
-            }
-            
-            // Skip if no course could be found
-            if (!$tmpCourse = $DB->get_record('course', array('id'=>$voucher->courseid))) {
-                continue;
-            }
-            
-            $voucher_users[$voucher->userid]->courses[$voucher->courseid] = $tmpCourse;
-            
-            if (!isset($reportdata->courses[$voucher->courseid])) {
-                $reportdata->courses[$voucher->courseid] = $voucher_users[$voucher->userid]->courses[$voucher->courseid];
+            foreach($voucherCourses as $voucherCourse) {
+                // Skip if its already added
+                // Could only happen with multiple vouchers for 1 user on 1 course
+                if (in_array($voucherCourse->courseid, $voucher_users[$voucher->userid]->courses)) {
+                    continue;
+                }
+
+                // Skip if no course could be found
+                if (!$tmpCourse = $DB->get_record('course', array('id'=>$voucherCourse->courseid))) {
+                    continue;
+                }
+
+                $voucher_users[$voucher->userid]->courses[$voucherCourse->courseid] = $tmpCourse;
+
+                if (!isset($reportdata->courses[$voucherCourse->courseid])) {
+                    $reportdata->courses[$voucherCourse->courseid] = $voucher_users[$voucher->userid]->courses[$voucherCourse->courseid];
+                }
             }
             
         } else {

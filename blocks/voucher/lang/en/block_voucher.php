@@ -67,6 +67,7 @@ $string['error:missing_group'] = 'The group(s) linked to this voucher does not e
 $string['error:voucher_amount_too_high'] = 'Please enter an amonut between {$a->min} and {$a->max}.';
 $string['error:alternative_email_required'] = 'If you have checked \'use alternative email\' this field is required.';
 $string['error:alternative_email_invalid'] = 'If you have checked \'use alternative email\' this field should contain a valid email address.';
+$string['error:course-not-found'] = 'The course could not be found.';
 
 $string['error:wrong_code_length'] = 'Please enter a number between 6 and 32.';
 $string['error:no_vouchers_submitted'] = 'None of your vouchers have been used yet.';
@@ -103,7 +104,7 @@ $string['label:voucher_connect_course_help'] = 'Select all courses you wish to a
 $string['label:connected_courses'] = 'Connected course(s)';
 $string['label:no_courses_connected'] = 'There are no courses connected to this cohort.';
 
-$string['label:voucher_course'] = 'Course';
+$string['label:voucher_courses'] = 'Courses';
 $string['label:voucher_cohorts'] = 'Cohort(s)';
 
 $string['label:cohort'] = 'Cohort';
@@ -129,7 +130,7 @@ $string['label:voucher_code_length_desc'] = 'Amount of characters of the voucher
 
 // Labels for already selected stuffz
 $string['label:selected_groups'] = 'Selected group(s)';
-$string['label:selected_course'] = 'Selected course';
+$string['label:selected_courses'] = 'Selected courses';
 $string['label:selected_cohort'] = 'Selected cohort(s)';
 
 $string['label:api_enabled'] = 'Enable API';
@@ -155,10 +156,10 @@ $string['label:voucher_type_help'] = 'The Vouchers will be generated based on ei
 $string['label:voucher_email_help'] = 'This is the email address the generated vouchers will be send to.';
 $string['label:voucher_amount_help'] = 'This is the the amount of vouchers that will be generated. Please use this field OR the field recipients, not both.';
 $string['label:voucher_cohorts_help'] = 'Select the one or more cohorts your users will be enrolled in.';
-$string['label:voucher_course_help'] = 'Select the course your users will be enrolled in.';
+$string['label:voucher_courses_help'] = 'Select the courses your users will be enrolled in.';
 $string['label:voucher_groups'] = 'Add group(s)';
-$string['label:voucher_groups_help'] = 'Select the groups you wish your users to be enrolled in upon enrolment in the course.';
-$string['label:no_groups_selected'] = 'There are no groups connected to this course yet.';
+$string['label:voucher_groups_help'] = 'Select the groups you wish your users to be enrolled in upon enrolment in the courses.';
+$string['label:no_groups_selected'] = 'There are no groups connected to these courses yet.';
 $string['label:image'] = 'Voucher background';
 $string['label:image_desc'] = 'Background to be placed in the generated vouchers';
 $string['label:current_image'] = 'Current Voucher background';
@@ -201,7 +202,7 @@ Met vriendelijke groet,<br /><br />
 $string['voucher_mail_csv_content'] = '
 Beste ##to_gender## ##to_name##,<br /><br />
 
-Onlangs heeft u zich ingeschreven voor onze opleiding ##course_fullname##, tijdens de opleiding heeft u toegang tot onze Online Leeromgeving: ##site_name##.<br /><br />
+Onlangs heeft u zich ingeschreven voor onze opleidingen ##course_fullnames##. Tijdens de opleidingen heeft u toegang tot onze Online Leeromgeving: ##site_name##.<br /><br />
 
 In deze omgeving vindt u naast de lesmateriaal ook de mogelijkheid tot netwerken met uw medecursisten. Deze opleiding start met een aantal voorbereidingsopdrachten, wij willen u vriendelijk verzoeken deze uiterlijk 3 (werk)dagen voor aanvang te bekijken. Zowel u, als de docent, kan zich dan goed voorbereiden op de opleiding.<br /><br />
 
@@ -258,22 +259,6 @@ $string['default-voucher-page-template-botright'] = '<ol>
 <li>2. Enter your voucher code in the Moodle Voucher block</li>
 <li>3. Happy learning!</li>
 </ol>';
-
-//$string['default-voucher-page-template-main'] = '
-//<p style="font-weight: bold;">Moodle Voucher</p><br/><br/>
-//<p>Hereby you receive the voucher with which you can subscribe for your course(s) in the digital learning environment.</p><br/><br/>
-//<p><table style="width:100%"><tr><td style="border:1px solid #000000; font-weight: bold; vertical-align: middle; text-align: center;">This is your voucher code: {vouchercode}</td></tr></table></p>
-//<p></p>
-//<p>Please follow the instructions below:</p><br/>
-//<ol>
-//<li>Open an internet browser</li>
-//<li>Go to the following website: <a href="{site_url}">{site_url}</a></li>
-//<li>Click - in the Voucher block - on the url "Input Voucher"</li>
-//<li>Enter the voucher code provided in this document (please note: This code is case-sensitive)</li>
-//<li>You are now subscribed and can enter your course(s).</li>
-//</ol><br/><br/>
-//<p>Happy learning!</p>';
-
 
 $string['pdf:titlename'] = 'Moodle Voucher';
 $string['pdf-meta:title'] = 'Moodle Voucher';
@@ -358,3 +343,4 @@ $string['no_cohorts_found'] = 'No cohorts have been found.';
 $string['no_courses_found'] = 'No courses have been found.';
 
 $string['report:download-excel'] = 'Download unused vouchers';
+$string['and'] = 'and';

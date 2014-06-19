@@ -34,7 +34,7 @@ class voucher_Helper {
      * @return True or an array of errors
      * */
     public static final function GenerateVouchers($vouchers) {
-        global $DB, $SITE;
+        global $DB, $SITE, $SESSION;
 
         $errors = array();
 
@@ -48,7 +48,6 @@ class voucher_Helper {
             $obj_voucher->timecreated = time();
             $obj_voucher->timeexpired = null;
             $obj_voucher->userid = null;
-            $obj_voucher->courseid = (!isset($voucher->courseid) || $voucher->courseid === null) ? null : $voucher->courseid;
             
             // Extra columns
             $obj_voucher->for_user_email = (isset($voucher->for_user_email) && !empty($voucher->for_user_email)) ? $voucher->for_user_email : null;
@@ -76,10 +75,24 @@ class voucher_Helper {
                 );
                 
                 // Check if we're generating based on course, in which case we enter the course name too.
-                if (!is_null($obj_voucher->courseid)) {
-                    $course = $DB->get_record('course', array('id'=>$obj_voucher->courseid));
-                    $arr_replace[] = '##course_fullname##';
-                    $arr_with[] = $course->fullname;
+                if (isset($voucher->courses) && !empty($voucher->courses)) {
+                    
+                    $strCourseFullnames = '';
+                    foreach($voucher->courses as $courseid) {
+                        
+                        if (!$course = $DB->get_record('course', array('id'=>$courseid))) {
+                            print_error('error:course-not-found', BLOCK_VOUCHER);
+                        }
+                        
+                        if ($courseid != end($voucher->courses)) {
+                            $strCourseFullnames .= $course->fullname . ', ';
+                        } elseif ($courseid) {
+                            $strCourseFullnames .= get_string('and', BLOCK_VOUCHER) . ' ' . $course->fullname;
+                        }
+                    }
+                    
+                    $arr_replace[] = '##course_fullnames##';
+                    $arr_with[] = $strCourseFullnames;
                 }
 
                 $obj_voucher->email_body = str_replace($arr_replace, $arr_with, $voucher->email_body);
@@ -93,40 +106,60 @@ class voucher_Helper {
                 continue;
             }
             
+            // Course voucher
+            if (isset($voucher->courses)) {
+                
+                // create group records for this voucher
+                if (isset($voucher->groups) && !empty($voucher->groups)) {
+                    foreach ($voucher->groups as $group) {
+
+                        // An object for each added group
+                        $obj_group = new stdClass();
+                        $obj_group->groupid = $group->groupid;
+                        $obj_group->voucherid = $voucher_id;
+
+                        // And insert in db
+                        if (!$DB->insert_record('voucher_groups', $obj_group)) {
+                            $errors[] = 'Failed to create group ' . $group->groupid . ' record for voucher id ' . $voucher_id . '.';
+                            continue;
+                        }
+                    }
+                }
+                
+                // create course records for this voucher id
+                if (!empty($voucher->courses)) { // can't be empty right..?
+                    foreach($voucher->courses as $courseid) {
+                        $obj_course = new stdClass();
+                        $obj_course->courseid = $courseid;
+                        $obj_course->voucherid = $voucher_id;
+
+                        if (!$DB->insert_record('voucher_courses', $obj_course)) {
+                            $errors[] = 'Failed to create course (id ' . $courseid . ') for voucher id ' . $voucher_id . '.';
+                            continue;
+                        }
+                    }
+                }
+                
             // Cohort voucher
-            if (!isset($voucher->courseid) || $voucher->courseid === null) {
+            } else {
+                
+                if (isset($voucher->cohorts) && !empty($voucher->cohorts)) {
+                    // Loop through all cohorts
+                    foreach ($voucher->cohorts as $cohort) {
 
-                // Loop through all cohorts
-                foreach ($voucher->cohorts as $cohort) {
+                        // An object for each added cohort
+                        $obj_cohort = new stdClass();
+                        $obj_cohort->voucherid = $voucher_id;
+                        $obj_cohort->cohortid = $cohort->cohortid;
 
-                    // An object for each added cohort
-                    $obj_cohort = new stdClass();
-                    $obj_cohort->voucherid = $voucher_id;
-                    $obj_cohort->cohortid = $cohort->cohortid;
-
-                    // And insert in db
-                    if (!$DB->insert_record('voucher_cohorts', $obj_cohort)) {
-                        $errors[] = 'Failed to create cohort ' . $cohort->cohortid . ' record for voucher id ' . $voucher_id . '.';
-                        continue;
+                        // And insert in db
+                        if (!$DB->insert_record('voucher_cohorts', $obj_cohort)) {
+                            $errors[] = 'Failed to create cohort ' . $cohort->cohortid . ' record for voucher id ' . $voucher_id . '.';
+                            continue;
+                        }
                     }
                 }
-
-                // Course voucher
-            } elseif (isset($voucher->groups)) {
-
-                foreach ($voucher->groups as $group) {
-
-                    // An object for each added cohort
-                    $obj_group = new stdClass();
-                    $obj_group->groupid = $group->groupid;
-                    $obj_group->voucherid = $voucher_id;
-
-                    // And insert in db
-                    if (!$DB->insert_record('voucher_groups', $obj_group)) {
-                        $errors[] = 'Failed to create group ' . $group->groupid . ' record for voucher id ' . $voucher_id . '.';
-                        continue;
-                    }
-                }
+                
             }
         }
         
@@ -319,9 +352,7 @@ class voucher_Helper {
         $phpmailer->FromName = trim($supportuser->firstname . ' ' . $supportuser->lastname);
         $phpmailer->IsHTML(true);
         $phpmailer->Subject = get_string('confirm_vouchers_sent_subject', BLOCK_VOUCHER);
-//        $phpmailer->AddCustomHeader("X-VOUCHER-Send: " . time());
         $phpmailer->AddAddress($owner->email);
-//        $phpmailer->AddReplyTo($obj_mailinfo->replyto);
 
         $res = $phpmailer->Send();
         
@@ -338,7 +369,6 @@ class voucher_Helper {
         }
         
         return $vouchers;
-        
     }
     
     public static final function GetUnusedVouchers() {

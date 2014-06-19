@@ -81,6 +81,7 @@ if (voucher_Helper::getPermission('generatevouchers'))
                 $groups = $DB->get_records("groups", array('courseid'=>$courseid));
                 if (count($groups) > 0) {
                     $hasGroups = true;
+                    break;
                 }
                 
             }
