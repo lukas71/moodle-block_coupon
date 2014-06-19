@@ -120,7 +120,7 @@ if (voucher_Helper::getPermission('generatevouchers'))
             
             $voucher = new stdClass();
             $voucher->ownerid = $USER->id;
-            $voucher->courseid = ($SESSION->voucher->type == 'course') ? $SESSION->voucher->course : null;
+            $voucher->courses = ($SESSION->voucher->type == 'course') ? $SESSION->voucher->courses : null;
             $voucher->redirect_url = $SESSION->voucher->redirect_url;
             $voucher->enrolperiod = $SESSION->voucher->enrolperiod;
             $voucher->issend = ($data->showform == 'amount') ? 1 : 0;
