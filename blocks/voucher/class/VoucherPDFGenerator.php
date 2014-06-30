@@ -189,7 +189,8 @@ class voucher_PDF extends pdf {
     function header() {
 
         // this is just guessing about SVG placement (i hope this will work everywhere)
-        $this->Image($this->_logo, 0, 0, 850, 1000, 'png', '', 'C', false, 300, '', false, false, 0, false, false, false);
+        //$this->Image($this->_logo, 0, 0, 850, 1000, 'png', '', 'C', false, 300, '', false, false, 0, false, false, false);
+        $this->Image($this->_logo, 0, 0, $this->w, $this->h, 'png', '', 'C', true, 300, '', false, false, 0, false, false, true);
         
         // header text
         $this->SetXY(0, 5);
