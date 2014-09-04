@@ -166,7 +166,7 @@ class voucher_Helper {
         return (count($errors) > 0) ? $errors : true;
     }
     
-    public static final function GetRecipientsFromCsv($recipients_str) {
+    public static final function GetRecipientsFromCsv($recipients_str, $delimiter) {
         
         $recipients = array();
         $count = 0;
@@ -178,7 +178,7 @@ class voucher_Helper {
         foreach($csvData as &$row) {
             
             // Get the next row
-            $row = str_getcsv($row, ",");
+            $row = str_getcsv($row, $delimiter);
             
             // Check if we're looking at the first row
             if ($count == 0) {
@@ -713,11 +713,11 @@ class voucher_Helper {
         );
     }
     
-    public static final function ValidateVoucherRecipients($csvdata) {
+    public static final function ValidateVoucherRecipients($csvdata, $delimiter) {
         
         $error = false;
         
-        if (!$recipients = voucher_Helper::GetRecipientsFromCsv($csvdata)) {
+        if (!$recipients = voucher_Helper::GetRecipientsFromCsv($csvdata, $delimiter)) {
             
             // Required columns aren't found in the csv
             $error = get_string('error:recipients-columns-missing', BLOCK_VOUCHER);

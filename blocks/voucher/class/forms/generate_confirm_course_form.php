@@ -54,6 +54,13 @@ class generate_confirm_course_form extends moodleform
         $mform->addElement('static', 'voucher_recipients_desc', '', get_string('voucher_recipients_desc', BLOCK_VOUCHER));
         $mform->addHelpButton('voucher_recipients', 'label:voucher_recipients', BLOCK_VOUCHER);
         $mform->addElement('static', 'sample_csv', '', $urlDownloadCsv);
+        
+        $delimiters = array();
+        $delimiters[] =& $mform->createElement('radio', 'delimiter', '', get_string('comma', BLOCK_VOUCHER), ',');
+        $delimiters[] =& $mform->createElement('radio', 'delimiter', '', get_string('semicolon', BLOCK_VOUCHER), ';');
+        $mform->addGroup($delimiters, 'delimiters', get_string('delimiter', BLOCK_VOUCHER), array(' '), false);
+        $mform->addHelpButton('delimiters', 'delimiter', BLOCK_VOUCHER);
+        $mform->setDefault('delimiter', ',');
 
         // Editable email message
         $mform->addElement('editor', 'email_body', get_string('label:email_body', BLOCK_VOUCHER), array('noclean'=>1));
@@ -79,6 +86,13 @@ class generate_confirm_course_form extends moodleform
         $mform->addHelpButton('group_voucher_recipients_manual', 'label:voucher_recipients_txt', BLOCK_VOUCHER);
         $mform->setDefault('voucher_recipients_manual', 'E-mail,Gender,Name');
 
+        $manualDelimiters = array();
+        $manualDelimiters[] =& $mform->createElement('radio', 'manual_delimiter', '', get_string('comma', BLOCK_VOUCHER), ',');
+        $manualDelimiters[] =& $mform->createElement('radio', 'manual_delimiter', '', get_string('semicolon', BLOCK_VOUCHER), ';');
+        $mform->addGroup($delimiters, 'manual_delimiters', get_string('delimiter', BLOCK_VOUCHER));
+        $mform->addHelpButton('manual_delimiters', 'delimiter', BLOCK_VOUCHER);
+        $mform->setDefault('manual_delimiter', ',');
+        
         // Editable email message
         $mform->addElement('editor', 'email_body_manual', get_string('label:email_body', BLOCK_VOUCHER), array('noclean'=>1));
         $mform->setType('email_body_manual', PARAM_RAW);
@@ -245,7 +259,7 @@ class generate_confirm_course_form extends moodleform
             
         } else {
             
-            $validationResult = voucher_Helper::ValidateVoucherRecipients($data['voucher_recipients_manual']);
+            $validationResult = voucher_Helper::ValidateVoucherRecipients($data['voucher_recipients_manual'], $data['delimiter']);
             if ($validationResult !== true) {
                 $errors['voucher_recipients_manual'] = $validationResult;
             }

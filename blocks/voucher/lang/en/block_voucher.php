@@ -176,6 +176,9 @@ $string['button:submit_voucher_code'] = 'Submit Voucher';
 $string['view:generate_voucher:title'] = 'Generate Voucher';
 $string['view:generate_voucher:heading'] = 'Generate Voucher';
 
+$string['view:api:title'] = 'Voucher - Api Docs';
+$string['view:api:heading'] = 'Voucher - Api Docs';
+
 $string['view:reports:heading'] = 'Report - Vouchers';
 $string['view:reports:title'] = 'Report - Vouchers';
 
@@ -346,3 +349,8 @@ $string['no_courses_found'] = 'No courses have been found.';
 
 $string['report:download-excel'] = 'Download unused vouchers';
 $string['and'] = 'and';
+
+$string['delimiter'] = 'Delimiter';
+$string['delimiter_help'] = 'Please select the delimiter used in the csv file.';
+$string['comma'] = 'Comma';
+$string['semicolon'] = 'Semi-colon';

@@ -101,7 +101,7 @@ if (voucher_Helper::getPermission('generatevouchers'))
             $SESSION->voucher->date_send_vouchers = $data->date_send_vouchers_manual;
             $SESSION->voucher->email_body = $data->email_body_manual['text'];
             // We'll get users right away
-            $recipients = voucher_Helper::GetRecipientsFromCsv($data->voucher_recipients_manual);
+            $recipients = voucher_Helper::GetRecipientsFromCsv($data->voucher_recipients_manual, $data->delimiter);
             
             $amountOfVouchers = count($recipients);
         }

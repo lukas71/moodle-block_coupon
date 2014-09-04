@@ -175,6 +175,9 @@ $string['button:submit_voucher_code'] = 'Invoeren';
 $string['view:generate_voucher:title'] = 'Genereer Voucher';
 $string['view:generate_voucher:heading'] = 'Genereer Voucher';
 
+$string['view:api:title'] = 'Voucher - Api Docs';
+$string['view:api:heading'] = 'Voucher - Api Docs';
+
 $string['view:reports:heading'] = 'Rapportage - Vouchers';
 $string['view:reports:title'] = 'Rapportage - Vouchers';
 
@@ -344,3 +347,8 @@ $string['no_courses_found'] = 'Er zijn geen cursussen gevonden.';
 
 $string['report:download-excel'] = 'Download ongebruikte vouchers';
 $string['and'] = 'en';
+
+$string['delimiter'] = 'Scheidingsteken';
+$string['delimiter_help'] = 'Selecteer hier het scheidingsteken gebruikt in het csv bestand.';
+$string['comma'] = 'Komma';
+$string['semicolon'] = 'Puntkomma';

@@ -473,6 +473,147 @@ final class VoucherAPI
         }
         
         return $reports;
+        
+    }
+    
+    static final public function GetIVMVoucherReports($type = 'all', $ownerid = null, $fromDate = null, $tillDate = null, $ccFromDate = null, $ccTillDate = null) {
+        global $DB;
+        
+        $ccFilter = ($ccFromDate != null || $ccTillDate != null);
+        
+        switch($type) {
+            
+            case 'all':
+                $vouchers = voucher_Db::GetAllVouchers($ownerid, $fromDate, $tillDate);
+                break;
+            
+            case 'courses':
+                $vouchers = voucher_Db::GetCourseVouchers($ownerid, $fromDate, $tillDate);
+                break;
+            
+            case 'cohorts':
+                $vouchers = voucher_Db::GetCohortVouchers($ownerid, $fromDate, $tillDate);
+                break;
+            
+            default:
+                throw new Exception("Incorrect type of vouchers requested. Please call either the type 'cohorts', 'courses' or 'all'.");
+                break;
+            
+        }
+        
+        $reports = array();
+        foreach($vouchers as $voucher) {
+            
+            $report = new stdClass();
+            $report->code = $voucher->submission_code;
+            $report->timecreated = date('Y:m:d H:i:s', $voucher->timecreated);
+            
+            if (!is_null($voucher->userid)) {
+                
+                if ($user = voucher_Db::GetUser(array('id'=>$voucher->userid))) {
+                    
+                    $report->user = new stdClass();
+                    $report->user->fullname = fullname($user);
+                    $report->user->email = $user->email;
+                    $report->user->idnumber = $user->idnumber;
+                    
+                    // Collect relnumber from pe-registration
+                    if ($DB->record_exists('block', array('name' => 'pe_registration'))) {
+                        
+                        if ($prUser = $DB->get_record('pr_user_organisations', array('userid'=>$voucher->userid, 'deleted'=>0))) {
+                            
+                            if (!is_null($prUser->relnumber)) {
+                                $report->user->relnumber = $prUser->relnumber;
+                            }
+                            
+                        }
+                        
+                    }
+                    
+                }
+            }
+            
+            if (isset($voucher->courses)) {
+                
+                $report->courses = array();
+                foreach($voucher->courses as $courseid) {
+                    
+                    if (!$course = voucher_Db::GetCourseById($courseid)) {
+                        continue;
+                    }
+                    
+                    $reportCourse = new stdClass();
+                    $reportCourse->id = $courseid;
+                    $reportCourse->course = $course->fullname;
+                    $reportCourse->idnumber = $course->idnumber;
+                    
+                    if (isset($user) && $user !== false) {
+                        
+                        $completionInfo = voucher_Helper::_LoadCourseCompletionInfo($user, $course);
+                        
+                        $params = array('course'=>$courseid, 'criteriatype'=>COMPLETION_CRITERIA_TYPE_GRADE);
+                        $completionCriteria = $DB->get_record('course_completion_criteria', $params);
+                        
+                        if ($ccFilter) {
+                            $completionInfo->date_complete = '04-09-2014 14:18:18';
+                            if ($completionInfo->date_complete == '-') {
+                                // no completion, so no report
+                                continue;
+                            }
+                            
+                            $timecomplete = strtotime($completionInfo->date_complete);
+                            if (!is_null($ccFromDate) && $timecomplete < $ccFromDate) {
+                                // completion time before requested time, so no report
+                                continue;
+                            }
+                            if (!is_null($ccTillDate) && $timecomplete > $ccTillDate) {
+                                // completion time after requested time, so no report
+                                continue;
+                            }
+                            
+                        }
+                        
+                        // set completion data
+                        $reportCourse->datestarted = $completionInfo->date_started;
+                        $reportCourse->datecompleted = $completionInfo->date_complete;
+                        $reportCourse->finalgrade = $completionInfo->str_grade;
+                        
+                        if ($completionCriteria !== false && !is_null($completionCriteria->gradepass)) {
+                            $reportCourse->gradetopass = $completionCriteria->gradepass;
+                        } else {
+                            $reportCourse->gradetopass = '-';
+                        }
+                        
+                    } elseif ($ccFilter) {
+                        // no user, so no course-completion, so no report.
+                        continue;
+                    }
+                    
+                    $report->courses[] = $reportCourse;
+                }
+                
+            } else {
+                
+                $report->cohorts = array();
+                foreach($voucher->cohorts as $cohortid) {
+                    
+                    if (!$cohort = voucher_Db::GetCohortById($cohortid)) {
+                        continue;
+                    }
+                    
+                    $reportCohort = new stdClass();
+                    $reportCohort->id = $cohortid;
+                    $reportCohort->name = $cohort->name;
+                    
+                    $report->cohorts[] = $reportCohort;
+                }
+                
+            }
+            
+            $reports[] = $report;
+        }
+        
+        return $reports;
     }
     
 }

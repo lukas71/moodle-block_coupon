@@ -63,7 +63,7 @@ if (voucher_Helper::getPermission('generatevouchers'))
         // Include the voucher generator
         require_once(BLOCK_VOUCHER_CLASSROOT . 'VoucherGenerator.php');
         // Get recipients
-        $recipients = voucher_Helper::GetRecipientsFromCsv($data->voucher_recipients);
+        $recipients = voucher_Helper::GetRecipientsFromCsv($data->voucher_recipients, $data->delimiter);
         
         // Get max length for the voucher code
         if (!$voucher_code_length = get_config('voucher', 'voucher_code_length')) $voucher_code_length = 16;
