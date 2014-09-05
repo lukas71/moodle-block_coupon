@@ -584,6 +584,14 @@ final class VoucherAPI
                             $reportCourse->gradetopass = '-';
                         }
                         
+                        // collect the feedback report
+                        $feedbackValue = voucher_Db::getIVMFeedbackValue($course->id, $user->id);
+                        $reportCourse->feedback = ($feedbackValue !== false) ? $feedbackValue : '-';
+                        
+                        // and finally the certificate
+                        $certificateCode = voucher_Db::getIVMCertificateCode($course->id, $user->id);
+                        $reportCourse->certificate = ($certificateCode !== false) ? $certificateCode->code : '-';
+                        
                     } elseif ($ccFilter) {
                         // no user, so no course-completion, so no report.
                         continue;

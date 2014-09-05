@@ -65,7 +65,6 @@ if (voucher_Helper::getPermission('generatevouchers'))
         $mform = new generate_confirm_cohorts_form($url);
         
     }
-//    exit("<pre>" . print_r($mform, true) . "</pre>");
     if ($mform->is_cancelled())
     {
         unset($SESSION->voucher);
@@ -82,6 +81,7 @@ if (voucher_Helper::getPermission('generatevouchers'))
         // If we're generating based on csv we'll redirect first to confirm the csv input
         if ($data->showform == 'csv') {
             
+            $SESSION->voucher->delimiter = $data->delimiter;
             $SESSION->voucher->date_send_vouchers = $data->date_send_vouchers;
             $SESSION->voucher->csv_content = $mform->get_file_content('voucher_recipients');
             $SESSION->voucher->email_body = $data->email_body['text'];
@@ -98,10 +98,12 @@ if (voucher_Helper::getPermission('generatevouchers'))
         
         // If we're generating based on manual csv input
         if ($data->showform == 'manual') {
+            
+            $SESSION->voucher->delimiter = $data->manual_delimiter;
             $SESSION->voucher->date_send_vouchers = $data->date_send_vouchers_manual;
             $SESSION->voucher->email_body = $data->email_body_manual['text'];
             // We'll get users right away
-            $recipients = voucher_Helper::GetRecipientsFromCsv($data->voucher_recipients_manual, $data->delimiter);
+            $recipients = voucher_Helper::GetRecipientsFromCsv($data->voucher_recipients_manual, $data->manual_delimiter);
             
             $amountOfVouchers = count($recipients);
         }

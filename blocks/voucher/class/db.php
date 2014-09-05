@@ -14,6 +14,9 @@
 class voucher_Db
 {
 
+    static $feedbackModule = null;
+    static $certificateModule = null;
+    
     /**
      * __construct() HIDE: WE'RE STATIC 
      */
@@ -443,6 +446,79 @@ class voucher_Db
         }
         
         return $select;
+    }
+    
+    public static final function getIVMCertificateCode($courseid, $userid) {
+        global $DB;
+        
+        // check if feedback is installed
+        if (!$certificate = self::getModuleInstance('certificate', $courseid)) {
+            return false;
+        }
+        
+        if (!$certificateIssue = $DB->get_record('certificate_issues', array('course'=>$courseid, 'userid'=>$userid))) {
+            return false;
+        }
+        
+        return $certificateIssue->code;
+    }
+    
+    public static final function getIVMFeedbackValue($courseid, $userid) {
+        global $DB;
+        
+        // check if feedback is installed
+        if (!$feedback = self::getModuleInstance('feedback', $courseid)) {
+            return false;
+        }
+        
+        $feedbackItems = $DB->get_records('feedback_item', array('feedback'=>$feedback->id, 'typ'=>'multichoice', 'label'=>BLOCK_VOUCHER_IVMFEEDBACK), 'id DESC', 0, 1);
+        if (empty($feedbackItems)) {
+            return false;
+        }
+        $feedbackItem = end($feedbackItems);
+        
+        // collect completed
+        $feedbackCompleted = $DB->get_record('feedback_completed', array('feedback'=>$feedback->id, 'userid'=>$userid, 'anonymous'=>'2'));
+        if (!$feedbackCompleted) {
+            return false;
+        }
+        
+        $feedbackValue = $DB->get_record('feedback_value', array('item'=>$feedbackItem->id, 'completed'=>$feedbackCompleted->id));
+        if (!$feedbackValue) {
+            return false;
+        }
+        
+        return $feedbackValue->value;
+    }
+    
+    public static final function getModuleInstance($moduleName, $courseid) {
+        global $DB;
+        
+        if (!$module = self::getModule($moduleName)) {
+            return false;
+        }
+        
+        // we get the last feedback instance
+        $moduleInstances = $DB->get_records($moduleName, array('course'=>$courseid), 'id DESC', 0, 1);
+        if (empty($moduleInstances)) {
+            return false;
+        }
+        $moduleInstance = end($moduleInstances);
+        
+        return $moduleInstance;
+    }
+    
+    public static final function getModule($name) {
+        global $DB;
+        
+        $var = $name . 'Module';
+        
+        if (!is_null(self::$$var)) {
+            return self::$$var;
+        }
+        
+        self::$$var = $DB->get_record('modules', array('name'=>$name));
+        return self::$$var;
     }
 
 }

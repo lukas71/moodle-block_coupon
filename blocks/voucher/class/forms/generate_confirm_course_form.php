@@ -56,11 +56,11 @@ class generate_confirm_course_form extends moodleform
         $mform->addElement('static', 'sample_csv', '', $urlDownloadCsv);
         
         $delimiters = array();
-        $delimiters[] =& $mform->createElement('radio', 'delimiter', '', get_string('comma', BLOCK_VOUCHER), ',');
-        $delimiters[] =& $mform->createElement('radio', 'delimiter', '', get_string('semicolon', BLOCK_VOUCHER), ';');
+        $delimiters[] =& $mform->createElement('radio', 'delimiter', '', get_string('comma', BLOCK_VOUCHER), 0);
+        $delimiters[] =& $mform->createElement('radio', 'delimiter', '', get_string('semicolon', BLOCK_VOUCHER), 1);
         $mform->addGroup($delimiters, 'delimiters', get_string('delimiter', BLOCK_VOUCHER), array(' '), false);
         $mform->addHelpButton('delimiters', 'delimiter', BLOCK_VOUCHER);
-        $mform->setDefault('delimiter', ',');
+        $mform->setDefault('delimiter', 0);
 
         // Editable email message
         $mform->addElement('editor', 'email_body', get_string('label:email_body', BLOCK_VOUCHER), array('noclean'=>1));
@@ -87,11 +87,11 @@ class generate_confirm_course_form extends moodleform
         $mform->setDefault('voucher_recipients_manual', 'E-mail,Gender,Name');
 
         $manualDelimiters = array();
-        $manualDelimiters[] =& $mform->createElement('radio', 'manual_delimiter', '', get_string('comma', BLOCK_VOUCHER), ',');
-        $manualDelimiters[] =& $mform->createElement('radio', 'manual_delimiter', '', get_string('semicolon', BLOCK_VOUCHER), ';');
-        $mform->addGroup($delimiters, 'manual_delimiters', get_string('delimiter', BLOCK_VOUCHER));
+        $manualDelimiters[] =& $mform->createElement('radio', 'manual_delimiter', '', get_string('comma', BLOCK_VOUCHER), 0);
+        $manualDelimiters[] =& $mform->createElement('radio', 'manual_delimiter', '', get_string('semicolon', BLOCK_VOUCHER), 1);
+        $mform->addGroup($manualDelimiters, 'manual_delimiters', get_string('delimiter', BLOCK_VOUCHER), array(' '), false);
         $mform->addHelpButton('manual_delimiters', 'delimiter', BLOCK_VOUCHER);
-        $mform->setDefault('manual_delimiter', ',');
+        $mform->setDefault('manual_delimiter', 0);
         
         // Editable email message
         $mform->addElement('editor', 'email_body_manual', get_string('label:email_body', BLOCK_VOUCHER), array('noclean'=>1));
@@ -259,7 +259,7 @@ class generate_confirm_course_form extends moodleform
             
         } else {
             
-            $validationResult = voucher_Helper::ValidateVoucherRecipients($data['voucher_recipients_manual'], $data['delimiter']);
+            $validationResult = voucher_Helper::ValidateVoucherRecipients($data['voucher_recipients_manual'], $data['manual_delimiter']);
             if ($validationResult !== true) {
                 $errors['voucher_recipients_manual'] = $validationResult;
             }

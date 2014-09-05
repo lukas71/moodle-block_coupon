@@ -170,7 +170,8 @@ class voucher_Helper {
         
         $recipients = array();
         $count = 0;
-
+        $delimiter = ($delimiter == 0) ? ',' : ';';
+        
         // Split up in rows
         $expectedColumns = array('e-mail', 'gender', 'name');
         if (!$csvData = str_getcsv($recipients_str, "\n")) return false;
@@ -286,10 +287,9 @@ class voucher_Helper {
     protected static final function _GenerateVoucherMail($emailTo, $emailBody = false, $initiatedByCron = false) {
         global $CFG, $USER;
 
-        require_once $CFG->libdir . '/phpmailer/class.phpmailer.php';
-
-        // instantiate mailer
-        $phpMailer = new PHPMailer();
+        // get the moodle phpmailer
+        require_once($CFG->libdir.'/phpmailer/moodle_phpmailer.php');
+        $phpMailer = new moodle_phpmailer();
         
         // set email from
         if ($initiatedByCron) {
@@ -338,23 +338,23 @@ class voucher_Helper {
     public static final function ConfirmVouchersSent($ownerid, $timecreated) {
         global $CFG;
         
-        require_once $CFG->libdir . '/phpmailer/class.phpmailer.php';
+        require_once($CFG->libdir.'/phpmailer/moodle_phpmailer.php');
+        $phpMailer = new moodle_phpmailer();
         
         $owner = voucher_Db::GetUser(array('id'=>$ownerid));
         
         $supportuser = core_user::get_support_user();
         $mail_content = get_string("confirm_vouchers_sent_body", BLOCK_VOUCHER, array('timecreated'=>date('Y-m-d', $timecreated)));
 
-        $phpmailer = new PHPMailer();
-        $phpmailer->Body = $mail_content;
-        $phpmailer->AltBody = strip_tags($mail_content);
-        $phpmailer->From = $supportuser->email;
-        $phpmailer->FromName = trim($supportuser->firstname . ' ' . $supportuser->lastname);
-        $phpmailer->IsHTML(true);
-        $phpmailer->Subject = get_string('confirm_vouchers_sent_subject', BLOCK_VOUCHER);
-        $phpmailer->AddAddress($owner->email);
+        $phpMailer->Body = $mail_content;
+        $phpMailer->AltBody = strip_tags($mail_content);
+        $phpMailer->From = $supportuser->email;
+        $phpMailer->FromName = trim($supportuser->firstname . ' ' . $supportuser->lastname);
+        $phpMailer->IsHTML(true);
+        $phpMailer->Subject = get_string('confirm_vouchers_sent_subject', BLOCK_VOUCHER);
+        $phpMailer->AddAddress($owner->email);
 
-        $res = $phpmailer->Send();
+        $res = $phpMailer->Send();
         
         return ($res);
     }
@@ -491,15 +491,11 @@ class voucher_Helper {
         global $CFG;
         $title = 'User Report';
 
-//        exit("<pre>" . print_r($reportdata, true) . "</pre>");
         $table = new html_table();
 
         $table->head = array(
             get_string('report:heading:username', BLOCK_VOUCHER),
-//            get_string('report:heading:function', BLOCK_VOUCHER),
-//            get_string('report:heading:department', BLOCK_VOUCHER),
             get_string('report:heading:coursename', BLOCK_VOUCHER),
-            //get_string('report:heading:coursetype', BLOCK_VOUCHER),
             get_string('report:heading:status', BLOCK_VOUCHER),
             get_string('report:heading:datestart', BLOCK_VOUCHER),
             get_string('report:heading:datecomplete', BLOCK_VOUCHER),
@@ -744,7 +740,7 @@ class voucher_Helper {
             }
             
         }
-
+        
         return ($error === false) ? true : $error;
     }
     

@@ -37,11 +37,11 @@ class generate_voucher_extra_form extends moodleform
         $mform->setDefault('voucher_recipients', $SESSION->voucher->csv_content);
 
         $delimiters = array();
-        $delimiters[] =& $mform->createElement('radio', 'yesno', '', get_string('comma', BLOCK_VOUCHER), ',');
-        $delimiters[] =& $mform->createElement('radio', 'yesno', '', get_string('semicolon', BLOCK_VOUCHER), ';');
-        $mform->addGroup($delimiters, 'delimiter', get_string('delimiter', BLOCK_VOUCHER), array(' '), false);
-        $mform->addHelpButton('delimiter', 'delimiter', BLOCK_VOUCHER);
-        $mform->setDefault('delimiter', ',');
+        $delimiters[] =& $mform->createElement('radio', 'delimiter', '', get_string('comma', BLOCK_VOUCHER), 0);
+        $delimiters[] =& $mform->createElement('radio', 'delimiter', '', get_string('semicolon', BLOCK_VOUCHER), 1);
+        $mform->addGroup($delimiters, 'delimiters', get_string('delimiter', BLOCK_VOUCHER), array(' '), false);
+        $mform->addHelpButton('delimiters', 'delimiter', BLOCK_VOUCHER);
+        $mform->setDefault('delimiter', $SESSION->voucher->delimiter);
         
         $this->add_action_buttons(true, get_string('button:save', BLOCK_VOUCHER));
     }
@@ -50,7 +50,7 @@ class generate_voucher_extra_form extends moodleform
         
         $errors = parent::validation($data, $files);
         
-        $recipientsError = voucher_Helper::ValidateVoucherRecipients($data['voucher_recipients'], $data['delimiter']);
+        $recipientsError = voucher_Helper::ValidateVoucherRecipients($data['voucher_recipients'], $data['delimiters']);
         
         if ($recipientsError !== true) {
             $errors['voucher_recipients'] = $recipientsError;

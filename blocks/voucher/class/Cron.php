@@ -21,9 +21,6 @@ class voucher_Cron
      */
     public function run()
     {
-        global $USER;
-//        return true;
-        
         // Call vouchers
         $vouchers = voucher_Db::GetVouchersToSend();
         
@@ -73,7 +70,7 @@ class voucher_Cron
                 }
             }
         }
-//        
+        
         return true;
     }
 
