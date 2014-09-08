@@ -480,6 +480,10 @@ final class VoucherAPI
         global $DB;
         
         $ccFilter = ($ccFromDate != null || $ccTillDate != null);
+        // check only course-vouchers if we're looking for min and/or max course-completion date
+        if ($ccFilter) {
+            $type = 'courses';
+        }
         
         switch($type) {
             
@@ -500,7 +504,7 @@ final class VoucherAPI
                 break;
             
         }
-        
+
         $reports = array();
         foreach($vouchers as $voucher) {
             
@@ -531,6 +535,10 @@ final class VoucherAPI
                     }
                     
                 }
+                
+            } elseif ($ccFilter) {
+                // If voucher has no user it has no course-completion. if filter enabled skip this record
+                continue;
             }
             
             if (isset($voucher->courses)) {
@@ -555,13 +563,14 @@ final class VoucherAPI
                         $completionCriteria = $DB->get_record('course_completion_criteria', $params);
                         
                         if ($ccFilter) {
-                            $completionInfo->date_complete = '04-09-2014 14:18:18';
+                            // use for test
+//                            $completionInfo->date_complete = '04-09-2014 14:18:18';
                             if ($completionInfo->date_complete == '-') {
                                 // no completion, so no report
                                 continue;
                             }
                             
-                            $timecomplete = strtotime($completionInfo->date_complete);
+                            $timecomplete = date('Y-m-d', strtotime($completionInfo->date_complete));
                             if (!is_null($ccFromDate) && $timecomplete < $ccFromDate) {
                                 // completion time before requested time, so no report
                                 continue;
@@ -590,11 +599,8 @@ final class VoucherAPI
                         
                         // and finally the certificate
                         $certificateCode = voucher_Db::getIVMCertificateCode($course->id, $user->id);
-                        $reportCourse->certificate = ($certificateCode !== false) ? $certificateCode->code : '-';
+                        $reportCourse->certificate = ($certificateCode !== false) ? $certificateCode : '-';
                         
-                    } elseif ($ccFilter) {
-                        // no user, so no course-completion, so no report.
-                        continue;
                     }
                     
                     $report->courses[] = $reportCourse;
@@ -617,7 +623,6 @@ final class VoucherAPI
                 }
                 
             }
-            
             $reports[] = $report;
         }
         

@@ -57,7 +57,7 @@ class voucher_Db
         global $DB;
         
         $sql_groups = "
-            SELECT vg.id, g.name FROM {voucher_groups} vg
+            SELECT vg.*, g.name FROM {voucher_groups} vg
             LEFT JOIN {groups} g ON vg.groupid = g.id
             WHERE vg.voucherid = $voucherid";
         $voucherGroups = $DB->get_records_sql($sql_groups);
@@ -456,7 +456,7 @@ class voucher_Db
             return false;
         }
         
-        if (!$certificateIssue = $DB->get_record('certificate_issues', array('course'=>$courseid, 'userid'=>$userid))) {
+        if (!$certificateIssue = $DB->get_record('certificate_issues', array('certificateid'=>$certificate->id, 'userid'=>$userid))) {
             return false;
         }
         
@@ -471,14 +471,14 @@ class voucher_Db
             return false;
         }
         
-        $feedbackItems = $DB->get_records('feedback_item', array('feedback'=>$feedback->id, 'typ'=>'multichoice', 'label'=>BLOCK_VOUCHER_IVMFEEDBACK), 'id DESC', 0, 1);
+        $feedbackItems = $DB->get_records('feedback_item', array('feedback'=>$feedback->id, 'typ'=>'multichoice', 'label'=>BLOCK_VOUCHER_IVMFEEDBACK), 'id DESC', '*', 0, 1);
         if (empty($feedbackItems)) {
             return false;
         }
         $feedbackItem = end($feedbackItems);
         
         // collect completed
-        $feedbackCompleted = $DB->get_record('feedback_completed', array('feedback'=>$feedback->id, 'userid'=>$userid, 'anonymous'=>'2'));
+        $feedbackCompleted = $DB->get_record('feedback_completed', array('feedback'=>$feedback->id, 'userid'=>$userid, 'anonymous_response'=>'2'));
         if (!$feedbackCompleted) {
             return false;
         }
@@ -499,7 +499,7 @@ class voucher_Db
         }
         
         // we get the last feedback instance
-        $moduleInstances = $DB->get_records($moduleName, array('course'=>$courseid), 'id DESC', 0, 1);
+        $moduleInstances = $DB->get_records($moduleName, array('course'=>$courseid), 'id DESC', '*', 0, 1);
         if (empty($moduleInstances)) {
             return false;
         }

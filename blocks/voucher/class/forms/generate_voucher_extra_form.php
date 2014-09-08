@@ -50,7 +50,7 @@ class generate_voucher_extra_form extends moodleform
         
         $errors = parent::validation($data, $files);
         
-        $recipientsError = voucher_Helper::ValidateVoucherRecipients($data['voucher_recipients'], $data['delimiters']);
+        $recipientsError = voucher_Helper::ValidateVoucherRecipients($data['voucher_recipients'], $data['delimiter']);
         
         if ($recipientsError !== true) {
             $errors['voucher_recipients'] = $recipientsError;

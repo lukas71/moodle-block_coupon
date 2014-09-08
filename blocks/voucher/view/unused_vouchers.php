@@ -94,7 +94,10 @@ if (voucher_Helper::getPermission('viewreports'))
             if ($voucherCohorts = voucher_Db::GetVoucherCohorts($voucher->id)) {
                 
                 foreach($voucherCohorts as $cohort) {
-                    $voucherReport->cohorts .= $cohort->name . "<br />";
+                    $voucherReport->cohorts .= $cohort->name;
+                    if ($cohort->cohortid != end($voucherCohorts)->cohortid) {
+                        $voucherReport->cohorts .= ', ';
+                    }
                 }
                 
             }
@@ -105,6 +108,10 @@ if (voucher_Helper::getPermission('viewreports'))
 
             foreach($voucherGroups as $group) {
                 $voucherReport->groups .= $group->name . "<br />";
+                if ($group->groupid != end($voucherGroups)->groupid) {
+                    $voucherReport->groups .= ', ';
+                }
+
             }
 
         }

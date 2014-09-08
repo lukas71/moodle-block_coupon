@@ -246,7 +246,7 @@ class generate_confirm_cohorts_form extends moodleform
             
         } else {
             
-            $validationResult = voucher_Helper::ValidateVoucherRecipients($data['voucher_recipients_manual'], $data['manual_delimiters']);
+            $validationResult = voucher_Helper::ValidateVoucherRecipients($data['voucher_recipients_manual'], $data['manual_delimiter']);
             if ($validationResult !== true) {
                 $errors['voucher_recipients_manual'] = $validationResult;
             }
