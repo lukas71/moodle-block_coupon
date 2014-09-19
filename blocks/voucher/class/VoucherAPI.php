@@ -401,7 +401,7 @@ final class VoucherAPI
             
             $report = new stdClass();
             $report->code = $voucher->submission_code;
-            $report->timecreated = date('Y:m:d H:i:s', $voucher->timecreated);
+            $report->timecreated = date('Y-m-d H:i:s', $voucher->timecreated);
             
             if (!is_null($voucher->userid)) {
                 
@@ -510,7 +510,8 @@ final class VoucherAPI
             
             $report = new stdClass();
             $report->code = $voucher->submission_code;
-            $report->timecreated = date('Y:m:d H:i:s', $voucher->timecreated);
+            $report->timecreated = date('Y-m-d H:i:s', $voucher->timecreated);
+            $report->user = null;
             
             if (!is_null($voucher->userid)) {
                 
@@ -520,6 +521,7 @@ final class VoucherAPI
                     $report->user->fullname = fullname($user);
                     $report->user->email = $user->email;
                     $report->user->idnumber = $user->idnumber;
+                    $report->user->relnumber = '';
                     
                     // Collect relnumber from pe-registration
                     if ($DB->record_exists('block', array('name' => 'pe_registration'))) {
@@ -583,27 +585,32 @@ final class VoucherAPI
                         }
                         
                         // set completion data
-                        $reportCourse->datestarted = $completionInfo->date_started;
-                        $reportCourse->datecompleted = $completionInfo->date_complete;
-                        $reportCourse->finalgrade = $completionInfo->str_grade;
+                        $reportCourse->datestarted = ($completionInfo->date_started != '-') ? $completionInfo->date_started : '';
+                        $reportCourse->datecompleted = ($completionInfo->date_complete != '-') ? $completionInfo->date_complete : '';
+                        $reportCourse->finalgrade = ($completionInfo->str_grade != '-') ? $completionInfo->str_grade : '';
                         
                         if ($completionCriteria !== false && !is_null($completionCriteria->gradepass)) {
                             $reportCourse->gradetopass = $completionCriteria->gradepass;
                         } else {
-                            $reportCourse->gradetopass = '-';
+                            $reportCourse->gradetopass = '';
                         }
                         
                         // collect the feedback report
                         $feedbackValue = voucher_Db::getIVMFeedbackValue($course->id, $user->id);
-                        $reportCourse->feedback = ($feedbackValue !== false) ? $feedbackValue : '-';
+                        $reportCourse->feedback = ($feedbackValue !== false) ? $feedbackValue : '';
                         
                         // and finally the certificate
                         $certificateCode = voucher_Db::getIVMCertificateCode($course->id, $user->id);
-                        $reportCourse->certificate = ($certificateCode !== false) ? $certificateCode : '-';
+                        $reportCourse->certificate = ($certificateCode !== false) ? $certificateCode : '';
                         
                     }
                     
                     $report->courses[] = $reportCourse;
+                }
+                
+                // if course-completion filtering set but no found courses with completion
+                if ($ccFilter && empty($report->courses)) {
+                    continue;
                 }
                 
             } else {
@@ -623,6 +630,7 @@ final class VoucherAPI
                 }
                 
             }
+
             $reports[] = $report;
         }
         

@@ -34,7 +34,7 @@ class Rest_Server extends Zend_Rest_Server {
         $this->_headers[] = "Cache-Control: post-check=0, pre-check=0";
         $this->_headers[] = "Pragma: no-cache";
 
-
+        
         //Parse/Load XML
         $xml = simplexml_load_string($xml);
 

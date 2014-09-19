@@ -32,6 +32,12 @@ if ($ADMIN->fulltree)
 //        'label:alternative_email',
 //        BLOCK_VOUCHER
 //    );
+    $settings->add(new admin_setting_heading(
+            'voucher/heading-general',
+            'form:heading:api',
+            'bla'
+        ));
+    
     $settings->add(new admin_setting_configtext(
             'voucher/alternative_email',
             get_string('label:alternative_email', BLOCK_VOUCHER),
