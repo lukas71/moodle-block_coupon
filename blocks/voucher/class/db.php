@@ -174,9 +174,15 @@ class voucher_Db
         $courses_select = "id != 1 AND visible = 1";
         $courses = $DB->get_records_select('course', $courses_select, null, 'fullname ASC');
         
-        foreach ($courses as &$course)
-        {
-            unset($course->summary);
+        // Check if we want to return the summary at all
+        $excludeCourseSummary = get_config('voucher', 'exclude_course_summary');
+        if ($excludeCourseSummary) {
+            
+            foreach ($courses as &$course)
+            {
+                unset($course->summary);
+            }
+            
         }
         
         return (!empty($courses)) ? $courses : false;

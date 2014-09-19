@@ -352,3 +352,12 @@ $string['delimiter'] = 'Scheidingsteken';
 $string['delimiter_help'] = 'Selecteer hier het scheidingsteken gebruikt in het csv bestand.';
 $string['comma'] = 'Komma';
 $string['semicolon'] = 'Puntkomma';
+
+$string['form:heading:api'] = 'API instellingen';
+$string['form:heading:general'] = 'Algemene instellingen';
+$string['form:heading:instructions'] = 'Instructies';
+
+$string['label:exclude_course_summary'] = 'Sluit cursus-omschrijving uit';
+$string['label:exclude_course_summary_desc'] = 'Wanneer aangevinkt zal de cursusomschrijving via de API call GetCourses niet geretourneerd worden.<br />
+    Dit kan fouten in de api voorkomen wanneer er onhandelbare tekens in de cursusomschrijving zitten.';
+

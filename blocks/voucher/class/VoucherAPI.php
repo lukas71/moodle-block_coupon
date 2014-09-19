@@ -413,6 +413,8 @@ final class VoucherAPI
                     $report->user->idnumber = $user->idnumber;
                     
                 }
+            } else {
+                $report->user = null;
             }
             
             if (isset($voucher->courses)) {

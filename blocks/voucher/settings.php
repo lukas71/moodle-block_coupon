@@ -17,27 +17,19 @@ defined('MOODLE_INTERNAL') || die('moodle_internal not defined');
 if ($ADMIN->fulltree)
 {
 
-//    // Use alternative email
-//    $usealtemail_help = voucher_Helper::generateHelpButton(
-//        'label:use_alternative_email',
-//        BLOCK_VOUCHER
-//    );
+    // General settings
+    $settings->add(new admin_setting_heading(
+            'voucher/heading_general',
+            get_string('form:heading:general', BLOCK_VOUCHER),
+            ''
+        ));
+    
     $settings->add(new admin_setting_configcheckbox(
             'voucher/use_alternative_email',
             get_string('label:use_alternative_email', BLOCK_VOUCHER),
             get_string('label:use_alternative_email_desc', BLOCK_VOUCHER),
             0
         ));
-//    $altemail_help = voucher_Helper::generateHelpButton(
-//        'label:alternative_email',
-//        BLOCK_VOUCHER
-//    );
-    $settings->add(new admin_setting_heading(
-            'voucher/heading-general',
-            'form:heading:api',
-            'bla'
-        ));
-    
     $settings->add(new admin_setting_configtext(
             'voucher/alternative_email',
             get_string('label:alternative_email', BLOCK_VOUCHER),
@@ -63,6 +55,14 @@ if ($ADMIN->fulltree)
             $max_voucher_choices
         ));
 
+    
+    // API settings
+    $settings->add(new admin_setting_heading(
+            'voucher/heading_api',
+            get_string('form:heading:api', BLOCK_VOUCHER),
+            ''
+        ));
+    
     $settings->add(new admin_setting_configcheckbox(
             'voucher/api_enabled',
             get_string('label:api_enabled', BLOCK_VOUCHER),
@@ -83,7 +83,23 @@ if ($ADMIN->fulltree)
             get_string('label:api_password_desc', BLOCK_VOUCHER),
             ''
         ));
+    
+    $settings->add(new admin_setting_configcheckbox(
+            'voucher/exclude_course_summary',
+            get_string('label:exclude_course_summary', BLOCK_VOUCHER),
+            get_string('label:exclude_course_summary_desc', BLOCK_VOUCHER),
+            0
+        ));
 
+    
+    
+    // Instructions settings
+    $settings->add(new admin_setting_heading(
+            'voucher/heading_instructions',
+            get_string('form:heading:instructions', BLOCK_VOUCHER),
+            ''
+        ));
+    
     // Information fields, to be displayed above each form
     $settings->add(new admin_setting_configtext(
             'voucher/info_voucher_type',

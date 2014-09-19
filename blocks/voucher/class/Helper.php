@@ -395,6 +395,7 @@ class voucher_Helper {
         static $cstatus, $completion_info = array();
         //static $cert_mod;
 
+//        require_once $CFG->dirroot . '/lib/grade/grade_item.php';
         require_once $CFG->dirroot . '/grade/querylib.php';
         require_once $CFG->dirroot . '/lib/completionlib.php';
 
@@ -424,7 +425,7 @@ class voucher_Helper {
             // do we have an enrolment for the course for this user
             $sql = 'SELECT ue.* FROM {user_enrolments} ue JOIN {enrol} e ON ue.enrolid=e.id WHERE ue.userid=' . $user->id . ' AND e.courseid='.$cinfo->id.' ORDER BY timestart ASC, timecreated ASC';
             $records = $DB->get_records_sql($sql);
-            if ($user->id == 28) echo("<pre>" . print_r($records, true) . "</pre>");
+//            if ($user->id == 28) echo("<pre>" . print_r($records, true) . "</pre>");
 
             if (count($records) === 1) {
                 $record = array_shift($records);
