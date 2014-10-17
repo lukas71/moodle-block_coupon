@@ -84,11 +84,21 @@ class voucher_Helper {
                             print_error('error:course-not-found', BLOCK_VOUCHER);
                         }
                         
-                        if ($courseid != end($voucher->courses)) {
-                            $strCourseFullnames .= $course->fullname . ', ';
-                        } elseif ($courseid) {
-                            $strCourseFullnames .= get_string('and', BLOCK_VOUCHER) . ' ' . $course->fullname;
+                        if (count($voucher->courses) > 1) {
+                            
+                            // add a comma or the str and
+                            if ($courseid != end($voucher->courses)) {
+                                $strCourseFullnames .= $course->fullname . ', ';
+                            } elseif ($courseid) {
+                                $strCourseFullnames .= get_string('and', BLOCK_VOUCHER) . ' ' . $course->fullname;
+                            }
+                            
+                        } else {
+                            
+                            $strCourseFullnames .= $course->fullname;
+                            
                         }
+                        
                     }
                     
                     $arr_replace[] = '##course_fullnames##';
@@ -395,7 +405,10 @@ class voucher_Helper {
         static $cstatus, $completion_info = array();
         //static $cert_mod;
 
+        require_once($CFG->libdir . '/gradelib.php');
 //        require_once $CFG->dirroot . '/lib/grade/grade_item.php';
+//        require_once $CFG->dirroot . '/lib/grade/constants.php';
+//        require_once $CFG->dirroot . '/lib/grade/grade_grade.php';
         require_once $CFG->dirroot . '/grade/querylib.php';
         require_once $CFG->dirroot . '/lib/completionlib.php';
 
@@ -445,7 +458,7 @@ class voucher_Helper {
                 $ci->time_started = (($started > 0) ? $started : $created);
                 $ci->date_started = date('d-m-Y H:i:s', ($started > 0) ? $started : $created);
             }
-
+            
             if ($com->is_course_complete($user->id)) {
                 // fetch details for course completion
                 $ci->complete = true;
@@ -454,11 +467,24 @@ class voucher_Helper {
                             'course' => $cinfo->id
                         ));
                 $ci->date_complete = date('d-m-Y H:i:s', $comcom->timecompleted);
-                $ci->gradeinfo = grade_get_course_grade($cinfo->id);
-                if ($ci->gradeinfo !== false) {
-                    $ci->str_grade = $ci->grade_info->str_grade;
-                }
+                
+                // get grade for the course-completion assignment
+                $grade_item = grade_item::fetch_course_item($cinfo->id);
+                $grade_grades = grade_grade::fetch_users_grades($grade_item, array($user->id), true);
+                // get final grade format
+                $finalgrade = grade_format_gradevalue($grade_grades[$user->id]->finalgrade, $grade_item, true, GRADE_DISPLAY_TYPE_REAL, 2);
+                // and add to the report
+                $ci->str_grade = $finalgrade;
+                
+//                $gradeinfo = grade_get_course_grade($cinfo->id);
+//                
+//                if ($gradeinfo !== false) {
+//                    
+//                    $gradeinfo = end($gradeinfo);
+//                    $ci->str_grade = $gradeinfo->str_grade;
+//                }
                 $ci->str_status = $cstatus['complete'];
+                
             } else {
                 // grrr... we need some complete info percentage... :(
                 $ci->str_status = $cstatus['started'];

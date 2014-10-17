@@ -520,6 +520,7 @@ final class VoucherAPI
                 if ($user = voucher_Db::GetUser(array('id'=>$voucher->userid))) {
                     
                     $report->user = new stdClass();
+                    $report->userid = $user->id;
                     $report->user->fullname = fullname($user);
                     $report->user->email = $user->email;
                     $report->user->idnumber = $user->idnumber;
@@ -559,7 +560,7 @@ final class VoucherAPI
                     $reportCourse->course = $course->fullname;
                     $reportCourse->idnumber = $course->idnumber;
                     
-                    if (isset($user) && $user !== false) {
+                    if (!is_null($voucher->userid) && isset($user) && $user !== false) {
                         
                         $completionInfo = voucher_Helper::_LoadCourseCompletionInfo($user, $course);
                         
@@ -568,7 +569,7 @@ final class VoucherAPI
                         
                         if ($ccFilter) {
                             // use for test
-//                            $completionInfo->date_complete = '04-09-2014 14:18:18';
+                            // $completionInfo->date_complete = '04-09-2014 14:18:18';
                             if ($completionInfo->date_complete == '-') {
                                 // no completion, so no report
                                 continue;

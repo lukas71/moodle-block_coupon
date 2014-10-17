@@ -30,6 +30,7 @@ class voucher_Cron
         $sentVouchers = array();
         $voucherSend = time(); // Dit moet even om ervoor te zorgen dat dingen per owner gegroepeerd worden
         //let op: dit verkloot meerdere batches per owner - Sebastian dd 2014-03-19
+        // en let op: de aanpassing verkloot wanneer er een seconde tussen de verwerking van meerdere vouchers zit..
         foreach($vouchers as $voucher) {
             
             // Check if we have an owner
@@ -61,10 +62,11 @@ class voucher_Cron
                 foreach($vouchers as $voucherTimeCreated) {
                     
                     if (voucher_Db::HasSendAllVouchers($ownerid, $voucherTimeCreated)) {
-
+                        
                         // Mail confirmation
                         voucher_Helper::ConfirmVouchersSent($ownerid, $voucherTimeCreated);
-
+                        break; // hhhm.... might fuck up multiple batches / owner.
+                        
                     }
                 
                 }
