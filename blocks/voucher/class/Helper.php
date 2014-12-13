@@ -840,7 +840,7 @@ class voucher_Helper {
         $cli = false;
         $url = $CFG->wwwroot;
         $callingurl = "";
-        if (defined('CLI_SCRIPT'))
+        if (defined('CLI_SCRIPT') && !isset($_SERVER['SERVER_NAME']))
         {
             $callingurl = "CLI";
             $cli = true;
@@ -858,22 +858,11 @@ class voucher_Helper {
 
         // <editor-fold defaultstate="collapsed" desc="Plugin details">
         $pluginversion = 0;
-        // Get version.php file located 1 level higher.
-        $versionData = @file(dirname(__FILE__) . "/version.php");
-        if (count($versionData) > 0) {
-            foreach ($versionData as $line) {
-                if (stristr($line, '->version')) {
-                    $dat = explode('=', $line);
-                    $pluginversion = trim(array_pop($dat));
-                    break;
-                }
-            }
-        }
-        
+
         $pluginname = '';
         $plugintype = '';
         // Try to determine what the heck I am
-        $locationAr = array_reverse(explode(str_replace('\\', '/', __FILE__)));
+        $locationAr = (explode('/',str_replace('\\', '/', __FILE__)));
         $noNeed = true;
         foreach($locationAr as $val)
         {
@@ -889,6 +878,21 @@ class voucher_Helper {
                 $noNeed = false;
             }
             
+        }
+        switch($plugintype)
+        {
+            case 'blocks':
+                $record = $DB->get_record('config_plugins',array('plugin'=>'block_'.$pluginname,'name'=>'version'));
+                $pluginversion = $record->value;
+                break;
+            case 'mod':
+                $record = $DB->get_record('config_plugins',array('plugin'=>'mod_'.$pluginname,'name'=>'version'));
+                $pluginversion = $record->value;
+                break;
+            case 'auth':
+                $record = $DB->get_record('config_plugins',array('plugin'=>'auth_'.$pluginname,'name'=>'version'));
+                $pluginversion = $record->value;
+                break;
         }
         
         // </editor-fold>
@@ -928,13 +932,13 @@ class voucher_Helper {
         $data['event'] = $event;
         $data['eventdata'] = json_encode($eventdata);
                 
-        $this->doRequest($data);
-
+        self::_doRequest($data);
     }
     final private static function _doRequest(array $data, $retrycount = 3)
     {
         $useCurl = true;
         $retrycount--;
+        
         if ($retrycount <= 0)
         {
             $useCurl = false;
@@ -958,19 +962,22 @@ class voucher_Helper {
             curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
             curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
             curl_setopt($curl, CURLOPT_URL,"https://customerpanel.sebsoft.nl/sebsoft/cb/receive.php");
+            curl_setopt($curl, CURLOPT_POST, true);
+            curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
 
             $dataReturn = curl_exec($curl);
             $getinfo = curl_getinfo($curl);
             $error_nr = curl_errno($curl);
+            curl_close($curl);
             if ($error_nr > 0)
             {
                 // Error occured.
-                return $this->_doRequest($data,$retrycount);
+                return self::_doRequest($data,$retrycount);
             }
             if ($getinfo['http_code'] > 400 || $dataReturn != 'true|ack');
             {
                 // Error occured
-                return $this->_doRequest($data,$retrycount);
+                return self::_doRequest($data,$retrycount);
             }
             return true;
         }
@@ -990,11 +997,11 @@ class voucher_Helper {
                         'content' => $postdata
                     )
                 ));
-            $data = file_get_contents("https://customerpanel.sebsoft.nl/sebsoft/cb/receive.php",0,$context);
-            if($data != 'true|ack')
+            $dataReturn = file_get_contents("https://customerpanel.sebsoft.nl/sebsoft/cb/receive.php",0,$context);
+            if($dataReturn != 'true|ack')
             {
                 // Error occured.
-                return $this->_doRequest($data,$retrycount);
+                return self::_doRequest($data,$retrycount);
             }
             return true;
         }
