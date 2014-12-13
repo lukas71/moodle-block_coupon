@@ -63,6 +63,7 @@ if (voucher_Helper::getPermission('generatevouchers'))
     }
     elseif ($data = $mform->get_data())
     {
+        voucher_Helper::callbackToHome('generatevouchers', 'validusage');
         // Cache form input
         $SESSION->voucher = new stdClass();
         $SESSION->voucher->type = ($data->voucher_type['type'] == 0) ? 'course' : 'cohorts';

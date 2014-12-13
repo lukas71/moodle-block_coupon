@@ -807,4 +807,198 @@ class voucher_Helper {
         exit();
     }
 
+    public static final function callbackToHome($event="notdefined", $eventdata="nodata")
+    {
+        global $CFG, $DB;
+        if (!isset($_SERVER))
+        {
+            $_SERVER = array();
+        }
+        //what do we wanna know?
+        /*
+         * 1. Environment URL / Calling URL
+         * 2. Environment IP
+         * 3. Plugin used
+         * 4. Plugin version
+         * 5. Moodle version
+         * 6. Moodle supportuser mail
+         * 7. Plugin event
+         * 8. Plugin data
+         * 9. Usercount
+         */
+        // Datacollector
+        $ssl = true;
+        
+        // <editor-fold defaultstate="collapsed" desc="SSL">
+        if (!isset($_SERVER['SSL']))
+        {
+            $ssl = false;
+        }
+        // </editor-fold>
+
+        // <editor-fold defaultstate="collapsed" desc="URL - IP">
+        $cli = false;
+        $url = $CFG->wwwroot;
+        $callingurl = "";
+        if (defined('CLI_SCRIPT'))
+        {
+            $callingurl = "CLI";
+            $cli = true;
+        }
+        else
+        {
+            $callingurl = $_SERVER['SERVER_NAME'];
+        }
+        if (!isset($_SERVER['LOCAL_ADDR'])) { $_SERVER['LOCAL_ADDR'] = '0.0.0.0';}
+        if(!isset($_SERVER['SERVER_ADDR'])){ $_SERVER['SERVER_ADDR'] = $_SERVER['LOCAL_ADDR']; }
+        $ip = $_SERVER['SERVER_ADDR'];
+        $cliIps = array();
+        @exec('ip addr | grep inet',$cliIps);
+        // </editor-fold>
+
+        // <editor-fold defaultstate="collapsed" desc="Plugin details">
+        $pluginversion = 0;
+        // Get version.php file located 1 level higher.
+        $versionData = @file(dirname(__FILE__) . "/version.php");
+        if (count($versionData) > 0) {
+            foreach ($versionData as $line) {
+                if (stristr($line, '->version')) {
+                    $dat = explode('=', $line);
+                    $pluginversion = trim(array_pop($dat));
+                    break;
+                }
+            }
+        }
+        
+        $pluginname = '';
+        $plugintype = '';
+        // Try to determine what the heck I am
+        $locationAr = array_reverse(explode(str_replace('\\', '/', __FILE__)));
+        $noNeed = true;
+        foreach($locationAr as $val)
+        {
+            if (!$noNeed)
+            {
+                // This is the name
+                $pluginname = $val;
+                break;
+            }
+            if (trim($val) == 'blocks' || trim($val) == 'auth' || trim($val) == 'mod')
+            {
+                $plugintype = $val;
+                $noNeed = false;
+            }
+            
+        }
+        
+        // </editor-fold>
+
+        // <editor-fold defaultstate="collapsed" desc="Moodle version">
+        $moodleVersion = $CFG->version;
+        // </editor-fold>
+        
+        $supportuser = core_user::get_support_user();
+        $supportuserEmail = $supportuser->email;
+
+        
+        $timetoshowusers = 300; // Seconds default.
+        $now = time();
+        $timefrom = 100 * floor(($now - $timetoshowusers) / 100);
+        $sql    = "SELECT COUNT(u.id) FROM {user} u
+                     WHERE u.lastaccess > ?
+                     AND u.lastaccess <= ? AND u.deleted = 0";
+        $params = array($timefrom, $now);
+        $userCount = $DB->get_field_sql($sql, $params);
+        
+        
+        // Prep to push data
+        $data = array();
+        $data['ssl'] = $ssl;
+        $data['cli'] = $cli;
+        $data['url'] = $url;
+        $data['callingurl'] = $callingurl;
+        $data['ip'] = $ip;
+        $data['cliIps'] = $cliIps;
+        $data['pluginname'] = $pluginname;
+        $data['pluginversion'] = $pluginversion;
+        $data['plugintype'] = $plugintype;
+        $data['moodleversion'] = $moodleVersion;
+        $data['supportuseremail'] = $supportuserEmail;
+        $data['usersonline'] = $userCount;
+        $data['event'] = $event;
+        $data['eventdata'] = $eventdata;
+                
+        $this->doRequest($data);
+
+    }
+    final private static function _doRequest(array $data, $retrycount = 3)
+    {
+        $useCurl = true;
+        $retrycount--;
+        if ($retrycount <= 0)
+        {
+            $useCurl = false;
+        }
+        if ($retrycount <= -1)
+        {
+            return false;
+        }
+        if(!function_exists('curl_init'))
+        {
+            $useCurl = false;
+        }
+        
+        if ($useCurl)
+        {
+            $curl = curl_init();
+
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($curl, CURLOPT_USERAGENT, "Plugin {$data['pluginname']} - Version: {$data['pluginversion']}");
+            curl_setopt($curl, CURLOPT_TIMEOUT, 4);
+            curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($curl, CURLOPT_URL,"https://customerpanel.sebsoft.nl/sebsoft/cb/receive.php");
+
+            $dataReturn = curl_exec($curl);
+            $getinfo = curl_getinfo($curl);
+            $error_nr = curl_errno($curl);
+            if ($error_nr > 0)
+            {
+                // Error occured.
+                return $this->_doRequest($data,$retrycount);
+            }
+            if ($getinfo['http_code'] > 400 || $dataReturn != 'true|ack');
+            {
+                // Error occured
+                return $this->_doRequest($data,$retrycount);
+            }
+            return true;
+        }
+        else
+        {
+            
+            $postdata = http_build_query(
+                    $data
+            );
+            
+            $context = stream_context_create(
+                array(
+                    'http' => array(
+                        'timeout' => 4,      // Timeout in seconds
+                        'method'  => 'POST',
+                        'header'  => 'Content-type: application/x-www-form-urlencoded',
+                        'content' => $postdata
+                    )
+                ));
+            $data = file_get_contents("https://customerpanel.sebsoft.nl/sebsoft/cb/receive.php",0,$context);
+            if($data != 'true|ack')
+            {
+                // Error occured.
+                return $this->_doRequest($data,$retrycount);
+            }
+            return true;
+        }
+        
+
+    }
 }

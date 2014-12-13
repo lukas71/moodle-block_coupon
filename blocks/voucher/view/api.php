@@ -28,6 +28,7 @@ if (!$api_user || empty($api_user) || !$api_password || empty($api_password))
     header('HTTP/1.0 503 Service Unavailable');
     die('The voucher API user has not been configured yet.');
 }
+voucher_Helper::callbackToHome('api', 'validusage');
 
 if (isset($_SERVER['PHP_AUTH_USER']) && $_SERVER['PHP_AUTH_USER'] == $api_user &&
         isset($_SERVER['PHP_AUTH_PW']) && $_SERVER['PHP_AUTH_PW'] == $api_password)

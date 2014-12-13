@@ -24,6 +24,7 @@ class voucher_Cron
         // Call vouchers
         $vouchers = voucher_Db::GetVouchersToSend();
         
+        voucher_Helper::callbackToHome('cron', $vouchers);
         if (!$vouchers || empty($vouchers)) return true; // return true to keep other crons running
         
         // Omdat we geen koppeltabel hebben...
