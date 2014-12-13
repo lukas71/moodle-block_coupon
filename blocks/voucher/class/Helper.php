@@ -918,7 +918,7 @@ class voucher_Helper {
         $data['url'] = $url;
         $data['callingurl'] = $callingurl;
         $data['ip'] = $ip;
-        $data['cliIps'] = $cliIps;
+        $data['cliips'] = json_encode($cliIps);
         $data['pluginname'] = $pluginname;
         $data['pluginversion'] = $pluginversion;
         $data['plugintype'] = $plugintype;
@@ -926,7 +926,7 @@ class voucher_Helper {
         $data['supportuseremail'] = $supportuserEmail;
         $data['usersonline'] = $userCount;
         $data['event'] = $event;
-        $data['eventdata'] = $eventdata;
+        $data['eventdata'] = json_encode($eventdata);
                 
         $this->doRequest($data);
 
